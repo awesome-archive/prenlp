@@ -27,10 +27,19 @@ pip install prenlp
 
 ### Data
 
-#### [Dataset Loading](https://github.com/lyeoni/prenlp/blob/master/prenlp/data/dataset.py)
+#### Dataset Loading
+
 Popular datasets for NLP tasks are provided in prenlp.
-- Language Modeling: WikiText-2, WikiText-103
 - Sentiment Analysis: IMDb, NSMC
+- Language Modeling: WikiText-2, WikiText-103, WikiText-ko, NamuWiki-ko
+
+|Dataset|Language|Articles|Sentences|Tokens|Vocab|Size|
+|-|-|-|-|-|-|-|
+|WikiText-2|English|720|-|2,551,843|33,278|13.3MB|
+|WikiText-103|English|28,595|-|103,690,236|267,735|517.4MB|
+|WikiText-ko|Korean|477,946|2,333,930|131,184,780|662,949|667MB|
+|NamuWiki-ko|Korean|661,032|16,288,639|715,535,778|1,130,008|3.3GB|
+|WikiText-ko+NamuWiki-ko|Korean|1,138,978|18,622,569|846,720,558|1,360,538|3.95GB|
 
 General use cases are as follows:
 
@@ -58,29 +67,32 @@ Frequently used normalization functions for text pre-processing are provided in 
 General use cases are as follows:
 ```python
 >>> from prenlp.data import Normalizer
->>> normalizer = Normalizer()
+>>> normalizer = Normalizer(url_repl='[URL]', tag_repl='[TAG]', emoji_repl='[EMOJI]', email_repl='[EMAIL]', tel_repl='[TEL]', image_repl='[IMG]')
 
 >>> normalizer.normalize('Visit this link for more details: https://github.com/')
-Visit this link for more details: [URL]
+'Visit this link for more details: [URL]'
 
 >>> normalizer.normalize('Use HTML with the desired attributes: <img src="cat.jpg" height="100" />')
-Use HTML with the desired attributes: [TAG]
+'Use HTML with the desired attributes: [TAG]'
 
 >>> normalizer.normalize('Hello 🤩, I love you 💓 !')
-Hello [EMOJI], I love you [EMOJI] !
+'Hello [EMOJI], I love you [EMOJI] !'
 
 >>> normalizer.normalize('Contact me at lyeoni.g@gmail.com')
-Contact me at [EMAIL]
+'Contact me at [EMAIL]'
 
 >>> normalizer.normalize('Call +82 10-1234-5678')
-Call [TEL]
+'Call [TEL]'
+
+>>> normalizer.normalize('Download our logo image, logo123.png, with transparent background.')
+'Download our logo image, [IMG], with transparent background.'
 ```
 
-### [Tokenizer](https://github.com/lyeoni/prenlp/blob/master/prenlp/tokenizer/tokenizer.py)
+### Tokenizer
 Frequently used (subword) tokenizers for text pre-processing are provided in prenlp.
 > SentencePiece, NLTKMosesTokenizer, Mecab
 
-#### SentencePiece
+#### [SentencePiece](https://github.com/lyeoni/prenlp/blob/master/prenlp/tokenizer/tokenizer.py)
 ```python
 >>> from prenlp.tokenizer import SentencePiece
 >>> tokenizer = SentencePiece()
@@ -92,13 +104,27 @@ Frequently used (subword) tokenizers for text pre-processing are provided in pre
 Time is the most valuable thing a man can spend.
 ```
 
-#### Moses tokenizer
+#### [Moses tokenizer](https://github.com/lyeoni/prenlp/blob/master/prenlp/tokenizer/tokenizer.py)
 ```python
 >>> from prenlp.tokenizer import NLTKMosesTokenizer
 >>> tokenizer = NLTKMosesTokenizer()
 >>> tokenizer('Time is the most valuable thing a man can spend.')
 ['Time', 'is', 'the', 'most', 'valuable', 'thing', 'a', 'man', 'can', 'spend', '.']
 ```
+
+#### Comparisons with tokenizers on IMDb
+Below figure shows the classification accuracy from various tokenizer.
+- Code: [NLTKMosesTokenizer](https://github.com/lyeoni/prenlp/blob/master/examples/fasttext_imdb.py), [SentencePiece](https://github.com/lyeoni/prenlp/blob/master/examples/fasttext_imdb_sentencepiece.py)
+<p align="center">
+<img width="700" src="https://raw.githubusercontent.com/lyeoni/prenlp/master/images/tokenizer_comparison_IMDb.png" align="middle">
+</p>
+
+#### Comparisons with tokenizers on NSMC (Korean IMDb)
+Below figure shows the classification accuracy from various tokenizer.
+- Code: [Mecab](https://github.com/lyeoni/prenlp/blob/master/examples/fasttext_nsmc.py), [SentencePiece](https://github.com/lyeoni/prenlp/blob/master/examples/fasttext_nsmc_sentencepiece.py)
+<p align="center">
+<img width="700" src="https://raw.githubusercontent.com/lyeoni/prenlp/master/images/tokenizer_comparison_NSMC.png" align="middle">
+</p>
 
 ## Author
 - Hoyeon Lee @lyeoni
